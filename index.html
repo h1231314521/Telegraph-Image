@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Telegraph 图床 | 免费上传</title>
   <style>
-    /* ===== 全局重置 & 字体 ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -23,8 +22,6 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
-    /* ===== 主卡片 ===== */
     .card {
       width: 100%;
       max-width: 480px;
@@ -38,8 +35,6 @@
       transition: transform 0.3s;
     }
     .card:hover { transform: translateY(-6px); }
-
-    /* ===== 头部 ===== */
     .header {
       display: flex;
       justify-content: space-between;
@@ -74,8 +69,6 @@
       color: #fff;
       border-color: rgba(255,255,255,0.5);
     }
-
-    /* ===== 上传区域 ===== */
     .upload-area {
       background: rgba(255,255,255,0.06);
       border: 2px dashed rgba(255,255,255,0.25);
@@ -93,7 +86,6 @@
       background: rgba(255,255,255,0.15);
       transform: scale(1.02);
     }
-
     .icon {
       width: 72px;
       height: 72px;
@@ -104,7 +96,6 @@
       height: 100%;
       filter: drop-shadow(0 8px 24px rgba(0,0,0,0.1));
     }
-
     .upload-text {
       color: #fff;
       font-size: 18px;
@@ -115,7 +106,6 @@
       color: rgba(255,255,255,0.55);
       font-size: 14px;
     }
-
     .btn-upload {
       display: inline-block;
       margin-top: 18px;
@@ -135,10 +125,7 @@
       box-shadow: 0 12px 36px rgba(0,0,0,0.25);
     }
     .btn-upload:active { transform: scale(0.96); }
-
     #fileInput { display: none; }
-
-    /* ===== 上传中状态 ===== */
     .status-uploading .icon svg {
       animation: spin 1.2s linear infinite;
     }
@@ -146,14 +133,10 @@
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-
-    /* ===== 成功状态 ===== */
     .status-done .upload-area {
       border-color: rgba(46, 213, 115, 0.5);
       background: rgba(46, 213, 115, 0.08);
     }
-
-    /* ===== 格式按钮组 ===== */
     .format-group {
       display: flex;
       gap: 8px;
@@ -183,8 +166,6 @@
       color: #667eea;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-
-    /* ===== 复制框 ===== */
     .copy-box {
       display: flex;
       background: rgba(255,255,255,0.12);
@@ -225,8 +206,6 @@
       height: 16px;
       fill: currentColor;
     }
-
-    /* ===== 重新上传 ===== */
     .reupload-link {
       display: inline-block;
       margin-top: 16px;
@@ -238,15 +217,11 @@
       transition: color 0.2s;
     }
     .reupload-link:hover { color: #fff; }
-
-    /* ===== 错误状态 ===== */
     .status-error .upload-area {
       border-color: rgba(255, 107, 107, 0.5);
       background: rgba(255, 107, 107, 0.08);
     }
     .error-text { color: #ff6b6b; font-weight: 500; }
-
-    /* ===== Toast 提示 ===== */
     .toast {
       position: fixed;
       bottom: 30px;
@@ -267,8 +242,6 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0px);
     }
-
-    /* ===== 响应式 ===== */
     @media (max-width: 480px) {
       .card { padding: 24px 16px 20px; }
       .logo { font-size: 22px; }
@@ -282,15 +255,12 @@
   <div id="toast" class="toast">✅ 已复制到剪贴板</div>
 
   <div class="card">
-    <!-- 头部：Logo + 后台入口 -->
     <div class="header">
       <div class="logo">📸 <span>Telegraph</span> 图床</div>
       <a href="/admin" class="admin-link">⚙️ 管理</a>
     </div>
 
-    <!-- 上传容器 -->
     <div id="app">
-      <!-- 空闲状态 -->
       <div id="stateIdle" class="upload-area" onclick="document.getElementById('fileInput').click()">
         <div class="icon">
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -304,7 +274,6 @@
         <input type="file" id="fileInput" accept="image/*,video/mp4" onchange="handleFileSelect(event)">
       </div>
 
-      <!-- 上传中 -->
       <div id="stateUploading" style="display:none;" class="upload-area status-uploading">
         <div class="icon">
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -315,7 +284,6 @@
         <div class="upload-hint">请稍等片刻</div>
       </div>
 
-      <!-- 成功 -->
       <div id="stateDone" style="display:none;" class="upload-area status-done">
         <div class="icon">
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -341,7 +309,6 @@
         <span class="reupload-link" onclick="resetUpload()">↻ 重新上传</span>
       </div>
 
-      <!-- 错误 -->
       <div id="stateError" style="display:none;" class="upload-area status-error">
         <div class="icon">
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -355,7 +322,6 @@
   </div>
 
   <script>
-    // ===== 核心逻辑 =====
     let uploadedUrl = '';
     let currentFormat = 'raw';
 
@@ -371,15 +337,19 @@
       if (!file) return;
       showState('uploading');
       const fd = new FormData();
-      fd.append('file', file);   // 字段名不变，保持 'file'
-      fetch('/upload', {        // 改为 /upload
+      fd.append('file', file);
+      fetch('/upload', {
         method: 'POST',
         body: fd
       })
         .then(r => r.json())
         .then(data => {
-          // 兼容多种返回字段
-          uploadedUrl = data.url || data.src || data.link || data.data?.url || '';
+          // 修正解析：后端返回的是数组，如 [{ src: "/file/xxx.png" }]
+          uploadedUrl = (Array.isArray(data) && data.length > 0) ? data[0].src : '';
+          // 如果还拿不到，尝试其他常见字段
+          if (!uploadedUrl) {
+            uploadedUrl = data.url || data.src || data.link || data.data?.url || '';
+          }
           if (!uploadedUrl) throw new Error('No URL returned');
           updateResult();
           showState('done');
@@ -393,10 +363,15 @@
     function updateResult() {
       const input = document.getElementById('resultUrl');
       if (!uploadedUrl) { input.value = ''; return; }
+      // 如果返回的 src 是相对路径，可能需要补全域名
+      let fullUrl = uploadedUrl;
+      if (uploadedUrl.startsWith('/file/')) {
+        fullUrl = window.location.origin + uploadedUrl;
+      }
       switch (currentFormat) {
-        case 'html':   input.value = `<img src="${uploadedUrl}" alt="image" />`; break;
-        case 'markdown': input.value = `![image](${uploadedUrl})`; break;
-        default:       input.value = uploadedUrl;
+        case 'html':   input.value = `<img src="${fullUrl}" alt="image" />`; break;
+        case 'markdown': input.value = `![image](${fullUrl})`; break;
+        default:       input.value = fullUrl;
       }
     }
 
@@ -465,7 +440,6 @@
       });
     }
 
-    // 初始状态
     showState('idle');
   </script>
 
