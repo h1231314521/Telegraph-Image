@@ -49,7 +49,10 @@ export async function onRequestPost(context) {
             throw new Error('Failed to get file ID');
         }
 
-        // 将文件信息保存到 KV 存储
+        // ✅ 获取当前登录用户邮箱（由全局中间件注入）
+        const userEmail = context.data?.user?.email || 'anonymous';
+
+        // 将文件信息保存到 KV 存储，包含 userId
         if (env.img_url) {
             await env.img_url.put(`${fileId}.${fileExtension}`, "", {
                 metadata: {
@@ -59,6 +62,7 @@ export async function onRequestPost(context) {
                     liked: false,
                     fileName: fileName,
                     fileSize: uploadFile.size,
+                    userId: userEmail,   // ✅ 记录上传者
                 }
             });
         }
